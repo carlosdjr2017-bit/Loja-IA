@@ -1,7 +1,3 @@
-/* ============================================================================
-   CLOUDFLARE PAGES - CABEÇALHOS DE SEGURANÇA MÁXIMA E CRIPTOGRAFIA EM TRÂNSITO
-   ============================================================================ */
-
 /*
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
