@@ -1,0 +1,970 @@
+/**
+ * ============================================================================
+ * APPLE HIG + LIQUID GLASS (iOS/macOS 26 & 27) DESIGN SYSTEM
+ * ============================================================================
+ * Regras da skill `liquid-glass` + `Apple-Hig-Designer-main` aplicadas:
+ * 1. Liquid Glass é exclusivo para a camada de CONTROLE E NAVEGAÇÃO (Navbar,
+ *    Floating Bag Bar, Segmented Controls, Toolbars e Sheets).
+ * 2. A camada de CONTEÚDO (Cards de produtos, textos e fotos) permanece limpa,
+ *    sólida e de alto contraste para destacar as fotos (Deference & Clarity).
+ * 3. Minimização dinâmica da barra de navegação ao rolar (`toolbarMinimizationBehavior`).
+ * 4. Geometria Concêntrica (`inner_radius + padding = outer_radius`).
+ * 5. Tinting seletivo apenas para ações primárias (Comprar / Confirmar no WhatsApp).
+ */
+
+:root {
+  --brand-accent: #007AFF;
+  --brand-accent-rgb: 0, 122, 255;
+  --brand-accent-soft: rgba(0, 122, 255, 0.12);
+
+  /* Liquid Glass Tokens (iOS 26 / 27 Specular & Translucent Material) */
+  --liquid-glass-bg: rgba(255, 255, 255, 0.68);
+  --liquid-glass-bg-elevated: rgba(255, 255, 255, 0.82);
+  --liquid-glass-border: rgba(255, 255, 255, 0.65);
+  --liquid-glass-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+                           inset 0 -1px 0 0 rgba(255, 255, 255, 0.25);
+  --liquid-glass-shadow: 0 10px 32px -4px rgba(0, 0, 0, 0.08),
+                         0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --liquid-blur: blur(24px) saturate(190%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --liquid-glass-bg: rgba(28, 28, 30, 0.68);
+    --liquid-glass-bg-elevated: rgba(44, 44, 46, 0.80);
+    --liquid-glass-border: rgba(255, 255, 255, 0.14);
+    --liquid-glass-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+                             inset 0 -1px 0 0 rgba(255, 255, 255, 0.06);
+    --liquid-glass-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.45),
+                           0 4px 12px -2px rgba(0, 0, 0, 0.3);
+  }
+}
+
+body {
+  background-color: var(--bg-grouped-primary);
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(var(--brand-accent-rgb), 0.07) 0%, transparent 38%),
+    radial-gradient(circle at 88% 18%, rgba(88, 86, 214, 0.06) 0%, transparent 42%);
+  background-attachment: fixed;
+  color: var(--label-primary);
+  overflow-x: hidden;
+  padding-bottom: 120px;
+}
+
+/* Garantir ocultação imediata de modais e barras com .hidden */
+.hig-modal-backdrop.hidden,
+.floating-bag-bar.hidden,
+.lgpd-banner.hidden,
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   LIQUID GLASS NAVIGATION BAR (COM MINIMIZAÇÃO NO SCROLL - iOS 27)
+   ========================================================================== */
+
+.hig-navbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border-bottom: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--liquid-glass-specular), var(--shadow-xs);
+  padding: 14px var(--space-4);
+  transition: padding var(--duration-normal) var(--ease-spring),
+              background-color var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+/* toolbarMinimizationBehavior on scroll */
+.hig-navbar.is-minimized {
+  padding: 8px var(--space-4);
+  background: var(--liquid-glass-bg-elevated);
+  box-shadow: var(--liquid-glass-specular), var(--liquid-glass-shadow);
+}
+
+.hig-navbar-inner {
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.brand-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-logo-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px; /* Concentric design */
+  background: linear-gradient(135deg, var(--brand-accent), var(--system-indigo));
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), var(--shadow-sm);
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width var(--duration-normal) var(--ease-spring),
+              height var(--duration-normal) var(--ease-spring);
+}
+
+.hig-navbar.is-minimized .brand-logo-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 17px;
+}
+
+.brand-logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-size: var(--text-headline);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--label-primary);
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: var(--text-caption1);
+  color: var(--label-secondary);
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.hig-navbar.is-minimized .brand-subtitle {
+  display: none;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ==========================================================================
+   LIQUID GLASS BUTTONS & CONTROLS
+   ========================================================================== */
+
+.hig-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-subhead);
+  font-weight: var(--font-weight-semibold);
+  border: none;
+  cursor: pointer;
+  transition: transform var(--duration-instant) var(--ease-spring),
+              opacity var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
+  text-decoration: none;
+  user-select: none;
+}
+
+.hig-btn:active {
+  transform: scale(0.96);
+}
+
+.hig-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Primary Tinted Liquid Glass Button */
+.hig-btn-primary {
+  background: var(--brand-accent);
+  color: #FFFFFF;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
+              0 4px 14px rgba(var(--brand-accent-rgb), 0.28);
+}
+
+.hig-btn-primary:hover {
+  opacity: 0.94;
+}
+
+/* Secondary Translucent Glass Button */
+.hig-btn-secondary {
+  background: var(--brand-accent-soft);
+  color: var(--brand-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* WhatsApp Prominent Action Button */
+.hig-btn-whatsapp {
+  background: linear-gradient(180deg, #2CE070 0%, #20BD5A 100%);
+  color: #FFFFFF;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
+              0 6px 20px rgba(37, 211, 102, 0.32);
+}
+
+.hig-btn-destructive {
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--system-red);
+}
+
+/* Pure Liquid Glass Control Button */
+.hig-btn-glass {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--liquid-glass-specular), var(--shadow-xs);
+  color: var(--label-primary);
+}
+
+.hig-btn-ghost {
+  background: var(--fill-tertiary);
+  color: var(--label-primary);
+}
+
+.hig-btn-sm {
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: var(--text-footnote);
+}
+
+/* ==========================================================================
+   LIQUID GLASS SEGMENTED CONTROL (CATEGORIAS & ABAS)
+   ========================================================================== */
+
+.segmented-control {
+  display: inline-flex;
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--liquid-glass-specular), var(--shadow-xs);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  gap: 4px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.segment-btn {
+  min-height: 38px;
+  padding: 6px 18px;
+  border: none;
+  background: transparent;
+  color: var(--label-secondary);
+  font-size: var(--text-footnote);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-spring);
+  white-space: nowrap;
+}
+
+.segment-btn.active {
+  background: var(--bg-tertiary);
+  color: var(--label-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   HERO VITRINE & STORE INFO CHIPS
+   ========================================================================== */
+
+.main-container {
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.hero-banner {
+  position: relative;
+  background: var(--bg-tertiary);
+  /* Concentric outer radius = 24px */
+  border-radius: var(--radius-3xl);
+  padding: var(--space-6);
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--separator);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .hero-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-8);
+  }
+}
+
+.hero-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: var(--brand-accent-soft);
+  color: var(--brand-accent);
+  font-size: var(--text-caption1);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-3);
+}
+
+.hero-title {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--label-primary);
+  line-height: 1.15;
+  margin-bottom: var(--space-2);
+}
+
+.hero-description {
+  font-size: var(--text-subhead);
+  color: var(--label-secondary);
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.store-info-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  color: var(--label-secondary);
+  font-size: var(--text-caption1);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   FILTER BAR (LIQUID GLASS SEARCH & SEGMENTED CLUSTER)
+   ========================================================================== */
+
+.toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 340px;
+}
+
+.search-box input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 16px 8px 40px;
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--liquid-glass-specular), var(--shadow-xs);
+  border-radius: var(--radius-full);
+  font-size: var(--text-subhead);
+  color: var(--label-primary);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.search-box input:focus {
+  border-color: var(--brand-accent);
+  box-shadow: var(--shadow-focus);
+}
+
+.search-box .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--label-tertiary);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   CONCENTRIC PRODUCT CARDS (CONTEÚDO SÓLIDO DE ALTO CONTRASTE - HIG DEFERENCE)
+   Rule: outer_radius (24px) = inner_radius (16px) + padding (8px)
+   ========================================================================== */
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+  gap: var(--space-5);
+}
+
+.product-card {
+  background: var(--bg-tertiary);
+  border-radius: 24px; /* Outer concentric radius */
+  padding: 8px;        /* Concentric padding */
+  border: 1px solid var(--separator);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.product-media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--bg-secondary);
+  border-radius: 16px; /* Inner concentric radius (24 - 8 = 16) */
+  overflow: hidden;
+}
+
+.product-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.product-card:hover .product-media img {
+  transform: scale(1.04);
+}
+
+/* Liquid Glass Overlay Badge on Media */
+.product-category-pill {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(20, 20, 22, 0.62);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+  font-size: var(--text-caption2);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.03em;
+}
+
+.gallery-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  background: rgba(20, 20, 22, 0.55);
+  backdrop-filter: blur(12px);
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+}
+
+.gallery-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  border: none;
+  cursor: pointer;
+}
+
+.gallery-dot.active {
+  background: #FFFFFF;
+  transform: scale(1.2);
+}
+
+.product-body {
+  padding: var(--space-3) var(--space-2) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-title {
+  font-size: var(--text-headline);
+  font-weight: var(--font-weight-semibold);
+  color: var(--label-primary);
+  margin-bottom: 4px;
+}
+
+.product-desc {
+  font-size: var(--text-footnote);
+  color: var(--label-secondary);
+  margin-bottom: var(--space-3);
+  line-height: 1.45;
+}
+
+.product-price-tag {
+  font-size: var(--text-title3);
+  font-weight: var(--font-weight-bold);
+  color: var(--label-primary);
+  margin-bottom: var(--space-3);
+}
+
+.sizes-label {
+  font-size: var(--text-caption1);
+  font-weight: var(--font-weight-semibold);
+  color: var(--label-secondary);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.sizes-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+}
+
+.size-chip {
+  min-width: 42px;
+  min-height: 38px;
+  padding: 4px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--separator);
+  background: var(--bg-secondary);
+  color: var(--label-primary);
+  font-size: var(--text-footnote);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--duration-instant) var(--ease-spring);
+}
+
+.size-chip:active {
+  transform: scale(0.94);
+}
+
+.size-chip.selected {
+  background: var(--brand-accent);
+  color: #FFFFFF;
+  border-color: var(--brand-accent);
+  box-shadow: 0 2px 8px rgba(var(--brand-accent-rgb), 0.3);
+}
+
+.product-actions {
+  margin-top: auto;
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ==========================================================================
+   EMPTY STATE (VITRINE DO COMPRADOR SEM PRODUTOS)
+   ========================================================================== */
+
+.empty-showcase {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-3xl);
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  max-width: 540px;
+  margin: var(--space-6) auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-icon-circle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--brand-accent-soft);
+  color: var(--brand-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  margin: 0 auto var(--space-4);
+}
+
+/* ==========================================================================
+   LIQUID GLASS MORPHING FLOATING BAG BAR (BARRA DA SACOLA DO COMPRADOR)
+   ========================================================================== */
+
+.floating-bag-bar {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 620px;
+  background: var(--liquid-glass-bg-elevated);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--liquid-glass-specular), var(--liquid-glass-shadow);
+  border-radius: var(--radius-full);
+  padding: 8px 10px 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  z-index: var(--z-fixed);
+  animation: slideUp var(--duration-normal) var(--ease-spring);
+}
+
+/* ==========================================================================
+   MODALS & LIQUID GLASS SHEETS (PRÉ-CHECK-IN, ADMIN & LGPD)
+   ========================================================================== */
+
+.hig-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .hig-modal-backdrop {
+    align-items: center;
+    padding: var(--space-4);
+  }
+}
+
+.hig-sheet {
+  background: var(--bg-tertiary);
+  width: 100%;
+  max-width: 540px;
+  max-height: 92dvh;
+  border-radius: 28px 28px 0 0;
+  padding: var(--space-5);
+  overflow-y: auto;
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--shadow-2xl);
+  animation: slideUp var(--duration-normal) var(--ease-out);
+}
+
+@media (min-width: 640px) {
+  .hig-sheet {
+    border-radius: 28px;
+    padding: var(--space-6);
+    animation: scaleIn var(--duration-normal) var(--ease-spring);
+  }
+}
+
+.hig-sheet-lg {
+  max-width: 920px;
+}
+
+.sheet-grabber {
+  width: 40px;
+  height: 5px;
+  background: var(--system-gray4);
+  border-radius: var(--radius-full);
+  margin: 0 auto var(--space-3);
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--separator);
+  margin-bottom: var(--space-4);
+}
+
+.sheet-title {
+  font-size: var(--text-title3);
+  font-weight: var(--font-weight-bold);
+}
+
+/* ==========================================================================
+   FORMS & INTUITIVE CONTROLS
+   ========================================================================== */
+
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--text-footnote);
+  font-weight: var(--font-weight-semibold);
+  color: var(--label-primary);
+  margin-bottom: 6px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--separator);
+  border-radius: 12px;
+  font-size: var(--text-body);
+  color: var(--label-primary);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.form-textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--brand-accent);
+  box-shadow: var(--shadow-focus);
+}
+
+.form-helper {
+  font-size: var(--text-caption1);
+  color: var(--label-secondary);
+  margin-top: 4px;
+}
+
+/* Swatches de Cores Intuitivos para o Lojista */
+.color-swatch-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.color-swatch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--separator);
+  background: var(--bg-tertiary);
+  color: var(--label-primary);
+  font-size: var(--text-footnote);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.color-swatch-btn.active {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px var(--brand-accent-soft);
+}
+
+.swatch-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ==========================================================================
+   ADMIN PANEL CARDS & PHOTO PREVIEW
+   ========================================================================== */
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+
+@media (min-width: 768px) {
+  .admin-grid {
+    grid-template-columns: 1.12fr 0.88fr;
+  }
+}
+
+.admin-card {
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: var(--space-5);
+  border: 1px solid var(--separator);
+}
+
+.admin-product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 14px;
+  margin-bottom: var(--space-2);
+  border: 1px solid var(--separator);
+}
+
+.admin-product-thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.photo-upload-dropzone {
+  border: 2px dashed var(--separator-opaque);
+  border-radius: 16px;
+  padding: var(--space-4);
+  text-align: center;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.photo-upload-dropzone:hover {
+  border-color: var(--brand-accent);
+}
+
+.uploaded-photos-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.uploaded-photo-item {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+}
+
+.uploaded-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploaded-photo-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 59, 48, 0.9);
+  color: #FFFFFF;
+  border: none;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   FOOTER & LOCK ACCESS FOR ADMIN
+   ========================================================================== */
+
+.store-footer {
+  max-width: var(--container-xl);
+  margin: var(--space-10) auto 0;
+  padding: var(--space-6) var(--space-4);
+  border-top: 1px solid var(--separator);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--label-secondary);
+  font-size: var(--text-footnote);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.code-block-sql {
+  background: #1C1C1E;
+  color: #30D158;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: var(--space-3);
+  border-radius: 12px;
+  overflow-x: auto;
+  max-height: 200px;
+  white-space: pre;
+}
+
+/* ==========================================================================
+   LGPD BANNER & TOASTS (LIQUID GLASS)
+   ========================================================================== */
+
+.lgpd-banner {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  left: var(--space-4);
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--liquid-glass-bg-elevated);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--liquid-glass-specular), var(--liquid-glass-shadow);
+  border-radius: 22px;
+  padding: var(--space-4);
+  z-index: var(--z-toast);
+}
+
+.toast-notification {
+  position: fixed;
+  top: 80px;
+  right: var(--space-4);
+  background: var(--liquid-glass-bg-elevated);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  color: var(--label-primary);
+  border: 1px solid var(--liquid-glass-border);
+  border-left: 4px solid var(--system-green);
+  padding: 12px 18px;
+  border-radius: 16px;
+  box-shadow: var(--liquid-glass-shadow);
+  z-index: var(--z-max);
+  font-size: var(--text-footnote);
+  font-weight: var(--font-weight-semibold);
+  animation: fadeIn var(--duration-fast) var(--ease-out);
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Vitrine Virtual de Chinelos e Roupas com Apple Liquid Glass, Criptografia de Ponta (AES-256-GCM), Conformidade LGPD e Pedido Direto no WhatsApp." />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Vitrine Premium — Mostruário Oficial</title>
+
+  <!-- Apple HIG + Liquid Glass Design System -->
+  <link rel="stylesheet" href="css/design-tokens.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <!-- SDK Oficial do Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- ========================================================================
+       BARRA DE NAVEGAÇÃO LIQUID GLASS (COMPRADOR)
+       Minimiza suavemente ao rolar a página (toolbarMinimizationBehavior)
+       ======================================================================== -->
+  <header class="hig-navbar" role="banner">
+    <div class="hig-navbar-inner">
+      <a href="#" class="brand-identity" aria-label="Início da Vitrine">
+        <div class="brand-logo-badge" id="store-logo-badge">V</div>
+        <div class="brand-titles">
+          <span class="brand-name" id="store-name-display">Vitrine Premium</span>
+          <span class="brand-subtitle" id="store-subtitle-display">Chinelos &amp; Roupas Exclusivas</span>
+        </div>
+      </a>
+
+      <div class="navbar-actions">
+        <!-- Botão de atendimento direto para o comprador (exibido quando o lojista cadastra o WhatsApp) -->
+        <a
+          id="nav-whatsapp-direct"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hig-btn hig-btn-whatsapp hig-btn-sm hidden"
+        >
+          <span>💬 Atendimento</span>
+        </a>
+
+        <!-- Acesso protegido por senha para o Administrador -->
+        <button
+          type="button"
+          class="hig-btn hig-btn-glass hig-btn-sm"
+          onclick="App.openAdminModal()"
+          title="Acesso exclusivo do Administrador (Protegido por Senha)"
+        >
+          <span>🔒 Admin</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       VITRINE DO COMPRADOR (EXPERIÊNCIA LIMPA E FOCADA NOS PRODUTOS)
+       ======================================================================== -->
+  <main class="main-container" role="main">
+
+    <!-- Apresentação da Loja -->
+    <section class="hero-banner" aria-label="Boas-vindas à vitrine">
+      <div>
+        <span class="hero-badge-pill" id="hero-badge-display">
+          ✨ Coleção Exclusiva • Atendimento Rápido
+        </span>
+        <h1 class="hero-title" id="hero-store-title">Estilo e conforto no seu passo.</h1>
+        <p class="hero-description" id="hero-store-desc">
+          Escolha suas peças favoritas na vitrine, selecione sua numeração ou tamanho e confirme tudo direto pelo WhatsApp.
+        </p>
+        <div class="store-info-pills" id="store-info-pills"></div>
+      </div>
+    </section>
+
+    <!-- Controles Liquid Glass: Filtro por Categoria (Chinelos / Roupas) e Busca -->
+    <section class="toolbar-filters" aria-label="Categorias da vitrine">
+      <div class="segmented-control" role="tablist" aria-label="Filtrar por categoria">
+        <button
+          type="button"
+          class="segment-btn active"
+          data-category-btn="todos"
+          onclick="App.setCategory('todos')"
+          role="tab"
+        >
+          Todos os Produtos
+        </button>
+        <button
+          type="button"
+          class="segment-btn"
+          data-category-btn="chinelos"
+          onclick="App.setCategory('chinelos')"
+          role="tab"
+        >
+          🩴 Chinelos
+        </button>
+        <button
+          type="button"
+          class="segment-btn"
+          data-category-btn="roupas"
+          onclick="App.setCategory('roupas')"
+          role="tab"
+        >
+          👕 Roupas
+        </button>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          id="catalog-search-input"
+          placeholder="Buscar chinelo ou roupa..."
+          aria-label="Buscar produtos"
+        />
+      </div>
+    </section>
+
+    <!-- Grade de Produtos da Vitrine -->
+    <section id="catalog-container" aria-live="polite"></section>
+
+  </main>
+
+  <!-- ========================================================================
+       RODAPÉ COM PRIVACIDADE LGPD & ACESSO ADMINISTRATIVO
+       ======================================================================== -->
+  <footer class="store-footer" role="contentinfo">
+    <div>
+      <strong id="footer-store-name">Vitrine Premium</strong> • Compra confirmada diretamente pelo WhatsApp.
+    </div>
+    <div class="footer-links">
+      <button type="button" class="hig-btn hig-btn-glass hig-btn-sm" onclick="App.openLgpdModal()">
+        🛡️ Privacidade LGPD &amp; Criptografia AES-256
+      </button>
+      <button type="button" class="hig-btn hig-btn-ghost hig-btn-sm" onclick="App.openAdminModal()">
+        🔒 Área do Lojista (Admin)
+      </button>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       BARRA FLUTUANTE LIQUID GLASS DO COMPRADOR (ITENS SELECIONADOS -> WHATSAPP)
+       ======================================================================== -->
+  <div id="floating-bag-bar" class="floating-bag-bar hidden" role="region" aria-label="Itens selecionados para o WhatsApp"></div>
+
+  <!-- ========================================================================
+       MODAL DE PRÉ-CHECK-IN DO COMPRADOR (ESTRITAMENTE NOME, TELEFONE E ENDEREÇO)
+       ======================================================================== -->
+  <div id="pre-checkin-modal" class="hig-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="checkin-modal-title">
+    <div class="hig-sheet">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <h2 class="sheet-title" id="checkin-modal-title">📋 Confirmar Pedido no WhatsApp</h2>
+        <button type="button" class="hig-btn hig-btn-ghost hig-btn-sm" onclick="App.closeModal('pre-checkin-modal')">
+          Fechar
+        </button>
+      </div>
+
+      <div style="margin-bottom: var(--space-4);">
+        <span class="text-caption1 font-semibold text-secondary" style="display: block; margin-bottom: 6px;">
+          SEUS ITENS ESCOLHIDOS:
+        </span>
+        <div id="checkin-selected-items"></div>
+      </div>
+
+      <form onsubmit="App.handlePreCheckinSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="checkin-name">Seu Nome *</label>
+          <input
+            type="text"
+            id="checkin-name"
+            class="form-input"
+            placeholder="Digite seu nome completo"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="checkin-phone">Seu Número de Telefone / WhatsApp *</label>
+          <input
+            type="tel"
+            id="checkin-phone"
+            class="form-input"
+            placeholder="Ex: (11) 99999-9999"
+            autocomplete="tel"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="checkin-address">Seu Endereço de Entrega *</label>
+          <textarea
+            id="checkin-address"
+            class="form-textarea"
+            rows="2"
+            placeholder="Rua, número, bairro, cidade / complemento"
+            autocomplete="street-address"
+            required
+          ></textarea>
+        </div>
+
+        <div class="p-3 bg-secondary rounded-lg" style="margin-bottom: var(--space-4); border: 1px solid var(--separator);">
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              id="checkin-lgpd-consent"
+              checked
+              required
+              style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--brand-accent); -webkit-appearance: checkbox; appearance: auto;"
+            />
+            <span class="text-caption1 text-secondary" style="line-height: 1.4;">
+              <strong>Proteção LGPD &amp; Criptografia AES-256-GCM:</strong> Autorizo o envio dos dados acima exclusivamente para confirmar meu pedido via WhatsApp com o vendedor (Lei nº 13.709/2018).
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" class="hig-btn hig-btn-whatsapp w-full">
+          <span>💬 Enviar Pedido para o WhatsApp Agora</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL RESTRITO DO ADMINISTRADOR (PROTEGIDO POR SENHA)
+       Cadastro de produtos, Gerenciador de WhatsApp e Personalização Intuitiva
+       ======================================================================== -->
+  <div id="admin-modal" class="hig-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">
+    <div class="hig-sheet hig-sheet-lg">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <h2 class="sheet-title" id="admin-modal-title">🔒 Painel do Administrador</h2>
+        <button type="button" class="hig-btn hig-btn-ghost hig-btn-sm" onclick="App.closeModal('admin-modal')">
+          Fechar
+        </button>
+      </div>
+      <div id="admin-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL DA CENTRAL DE PRIVACIDADE LGPD & CRIPTOGRAFIA DE PONTA
+       ======================================================================== -->
+  <div id="lgpd-modal" class="hig-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="lgpd-modal-title">
+    <div class="hig-sheet">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <h2 class="sheet-title" id="lgpd-modal-title">🛡️ Criptografia de Ponta &amp; Central LGPD</h2>
+        <button type="button" class="hig-btn hig-btn-ghost hig-btn-sm" onclick="App.closeModal('lgpd-modal')">
+          Fechar
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div class="p-3 bg-secondary rounded-lg">
+          <div class="text-subhead font-semibold" style="margin-bottom: 4px;">🔐 Criptografia Ativa (Web Crypto API)</div>
+          <p class="text-caption1 text-secondary">
+            • <strong>AES-256-GCM Autenticado:</strong> Proteção de dados locais com vetor de inicialização (IV) de 96 bits.<br/>
+            • <strong>PBKDF2-HMAC-SHA256:</strong> Derivação de chave com 150.000 iterações.<br/>
+            • <strong>SHA-256:</strong> Proteção da senha do administrador e protocolo de integridade dos pedidos.
+          </p>
+        </div>
+
+        <div class="p-3 bg-secondary rounded-lg">
+          <div class="text-subhead font-semibold" style="margin-bottom: 4px;">⚖️ Direitos do Titular (Lei nº 13.709/2018)</div>
+          <p class="text-caption1 text-secondary">
+            • Coletamos apenas <strong>Nome, Telefone e Endereço</strong> no pré-check-in para enviar seu pedido diretamente ao WhatsApp da loja.<br/>
+            • Contato de Privacidade (DPO): <span id="lgpd-dpo-display" class="font-semibold">privacidade@loja.com.br</span>
+          </p>
+        </div>
+
+        <div id="lgpd-user-data-status"></div>
+
+        <div class="flex gap-2 flex-wrap" style="margin-top: 6px;">
+          <button type="button" class="hig-btn hig-btn-secondary hig-btn-sm" style="flex: 1;" onclick="App.exportMyPersonalData()">
+            📥 Baixar Meus Dados (JSON)
+          </button>
+          <button type="button" class="hig-btn hig-btn-destructive hig-btn-sm" style="flex: 1;" onclick="App.deleteMyPersonalData()">
+            🗑️ Apagar Meus Dados Agora
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       BANNER DE TRANSPARÊNCIA LGPD (LIQUID GLASS)
+       ======================================================================== -->
+  <aside id="lgpd-consent-banner" class="lgpd-banner hidden" aria-label="Aviso de Privacidade LGPD">
+    <div class="flex flex-col gap-3">
+      <div>
+        <div class="text-subhead font-semibold">🛡️ Site Protegido por Criptografia AES-256 &amp; LGPD</div>
+        <p class="text-caption1 text-secondary" style="margin-top: 4px;">
+          Seus dados de pré-check-in são criptografados e usados exclusivamente para direcionar seu pedido ao WhatsApp oficial da loja.
+        </p>
+      </div>
+      <div class="flex gap-2 justify-end">
+        <button type="button" class="hig-btn hig-btn-ghost hig-btn-sm" onclick="App.openLgpdModal()">
+          Ver Detalhes
+        </button>
+        <button type="button" class="hig-btn hig-btn-primary hig-btn-sm" onclick="App.acceptLgpdBanner()">
+          Concordar e Continuar
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Scripts da Aplicação -->
+  <script src="js/crypto-lgpd.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

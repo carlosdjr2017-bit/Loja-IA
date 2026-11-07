@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// ============================================================================
+// REGRAS DE SEGURANÇA DO FIREBASE FIRESTORE (VITRINE + LGPD)
+// Como usar: No Console do Firebase -> Firestore Database -> Aba "Regras" (Rules),
+// cole este conteúdo e clique em "Publicar".
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Configurações da Loja: Leitura pública para exibir a vitrine; escrita pelo Painel
+    match /store_settings/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 2. Catálogo de Produtos (Chinelos e Roupas): Leitura pública; escrita pelo Painel
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 3. Logs de Consentimento LGPD (Apenas inserção de hashes SHA-256 anonimizados)
+    match /lgpd_consent_logs/{logId} {
+      allow create: if request.resource.data.keys().hasAll(['consent_hash', 'purpose', 'created_at']);
+      allow read: if true;
+      allow update, delete: if false;
+    }
+  }
+}
